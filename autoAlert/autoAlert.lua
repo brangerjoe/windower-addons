@@ -13,6 +13,7 @@ background_interrupt = "background_interrupt"
 playerResolution = T {}
 playerResolution.x = windower.get_windower_settings().x_res
 playerResolution.y = windower.get_windower_settings().y_res
+emphasize = {}
 caption = texts.new({})
 showing = false
 last_trigger = -1
@@ -52,6 +53,10 @@ windower.register_event(
             show_caption(arg, "ws")
         elseif cmd == "ma" then
             show_caption(arg, "ma")
+        elseif cmd == "int" then
+            show_caption(arg, "int")
+        elseif cmd == "emphasize" then
+            emphasize[arg] = true
         end
     end
 )
@@ -116,6 +121,10 @@ function show_caption(text, type)
     showing = true
     caption:text(text)
     caption:show()
+
+    if (emphasize[text]) then
+        windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
+    end
 
     if (type == "ws") then
         windower.play_sound(windower.addon_path .. "sounds/ability_alert.wav")
