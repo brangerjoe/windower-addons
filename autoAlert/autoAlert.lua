@@ -56,7 +56,8 @@ windower.register_event(
         elseif cmd == "int" then
             show_caption(arg, "int")
         elseif cmd == "emphasize" then
-            emphasize[arg] = true
+            windower.add_to_chat(207, 'Added "' .. arg .. '" to emphasize.')
+            emphasize["" .. arg .. ""] = true
         end
     end
 )
@@ -88,10 +89,10 @@ windower.register_event(
                 "???"
 
             if act.param == interrupt_id then
-                skill_name = "Interrupted!"
-                show_caption(skill_name, "int")
+                spell_name = "Interrupted!"
+                show_caption(spell_name, "int")
             else
-                show_caption(skill_name, "ma")
+                show_caption(spell_name, "ma")
             end
         end
     end
@@ -118,13 +119,10 @@ function create_backgrounds(x, y)
 end
 
 function show_caption(text, type)
+    hide_caption()
     showing = true
     caption:text(text)
     caption:show()
-
-    if (emphasize[text]) then
-        windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
-    end
 
     if (type == "ws") then
         windower.play_sound(windower.addon_path .. "sounds/ability_alert.wav")
@@ -136,6 +134,11 @@ function show_caption(text, type)
         windower.play_sound(windower.addon_path .. "sounds/interrupt_alert.wav")
         windower.prim.set_visibility(background_interrupt, true)
     end
+
+    if (emphasize[text]) then
+        windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
+    end
+
     last_trigger = os.time()
 end
 
