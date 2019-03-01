@@ -48,7 +48,8 @@ windower.register_event(
         if showing then
             local x, y = caption:extents()
             local x_offset = settings.x_position - x / 2
-            local y_offset = defaults.background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
+            local y_offset =
+                defaults.background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
             caption:pos(x_offset, y_offset)
             if os.time() - last_trigger > settings.trigger_duration then
                 hide_caption()
@@ -64,9 +65,9 @@ windower.register_event(
         if not cmd or cmd == "help" then
             print("Usage Examples")
             print("//aa test ws")
-            print("\tShows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
+            print("► Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
             print("//aa emphasize Firaga VI")
-            print("\tEmphasizes Firaga VI (toggles on and off).")
+            print("► Emphasizes Firaga VI (toggles on and off).")
         end
 
         local args = L {...}
@@ -83,6 +84,12 @@ windower.register_event(
             local verb = settings.emphasize[estring:lower()] and "Removed" or "Added"
             print("Emphasize: " .. verb .. ' "' .. estring .. '".')
             settings.emphasize[estring:lower()] = settings.emphasize[estring:lower()] and false or true
+        elseif cmd == "pos" then
+            settings.x_position = args[1]
+            settings.y_position = args[2]
+            settings:save()
+            print("Moved display to: " .. args[1] .. "," .. args[2])
+            create_backgrounds(settings.x_position - 250, settings.y_position)
         end
     end
 )
