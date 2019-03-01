@@ -48,7 +48,7 @@ windower.register_event(
         if showing then
             local x, y = caption:extents()
             local x_offset = settings.x_position - x / 2
-            local y_offset = background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
+            local y_offset = defaults.background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
             caption:pos(x_offset, y_offset)
             if os.time() - last_trigger > settings.trigger_duration then
                 hide_caption()
