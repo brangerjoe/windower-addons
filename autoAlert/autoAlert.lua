@@ -21,11 +21,15 @@ trigger_duration = 3
 weapon_skill_category = 7
 magic_category = 8
 interrupt_id = 28787
+background_size = regular
+x_position = playerResolution.x / 2
+y_position = 50
+background_size = "regular"
 
 windower.register_event(
     "load",
     function()
-        create_backgrounds((playerResolution.x / 2) - 250, 50)
+        create_backgrounds(x_position - 250, y_position)
         caption:bg_visible(false)
         caption:bold(true)
     end
@@ -36,7 +40,9 @@ windower.register_event(
     function()
         if showing then
             local x, y = caption:extents()
-            caption:pos(playerResolution.x / 2 - x / 2, 53)
+            local x_offset = x_position - x / 2
+            local y_offset = background_size == "regular" and y_position + 10 or y_position + 3
+            caption:pos(x_offset, y_offset)
             if os.time() - last_trigger > trigger_duration then
                 hide_caption()
             end
@@ -117,19 +123,28 @@ windower.register_event(
 function create_backgrounds(x, y)
     windower.prim.create(background_ability)
     windower.prim.set_fit_to_texture(background_ability, true)
-    windower.prim.set_texture(background_ability, windower.addon_path .. "images/background_ability.png")
+    windower.prim.set_texture(
+        background_ability,
+        windower.addon_path .. "images/" .. background_size .. "/background_ability.png"
+    )
     windower.prim.set_position(background_ability, x, y)
     windower.prim.set_visibility(background_ability, false)
 
     windower.prim.create(background_magic)
     windower.prim.set_fit_to_texture(background_magic, true)
-    windower.prim.set_texture(background_magic, windower.addon_path .. "images/background_magic.png")
+    windower.prim.set_texture(
+        background_magic,
+        windower.addon_path .. "images/" .. background_size .. "/background_magic.png"
+    )
     windower.prim.set_position(background_magic, x, y)
     windower.prim.set_visibility(background_magic, false)
 
     windower.prim.create(background_interrupt)
     windower.prim.set_fit_to_texture(background_interrupt, true)
-    windower.prim.set_texture(background_interrupt, windower.addon_path .. "images/background_interrupt.png")
+    windower.prim.set_texture(
+        background_interrupt,
+        windower.addon_path .. "images/" .. background_size .. "/background_interrupt.png"
+    )
     windower.prim.set_position(background_interrupt, x, y)
     windower.prim.set_visibility(background_interrupt, false)
 end
