@@ -48,16 +48,28 @@ windower.register_event(
 windower.register_event(
     "addon command",
     function(cmd, ...)
-        local arg = ...
-        if cmd == "ws" then
-            show_caption(arg, "ws")
-        elseif cmd == "ma" then
-            show_caption(arg, "ma")
-        elseif cmd == "int" then
-            show_caption(arg, "int")
+        if not cmd or cmd == "help" then
+            print("Usage Examples")
+            print("//aa test ws")
+            print("\tShows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
+            print("//aa emphasize Firaga VI")
+            print("\tEmphasizes Firaga VI (toggles on and off).")
+        end
+
+        local args = L {...}
+        if cmd == "test" then
+            if args[1] == "ws" then
+                show_caption("Self-Destruct", "ws")
+            elseif args[1] == "ma" then
+                show_caption("Tornado II", "ma")
+            elseif args[1] == "int" then
+                show_caption("Interrupted!", "int")
+            end
         elseif cmd == "emphasize" then
-            windower.add_to_chat(207, 'Added "' .. arg .. '" to emphasize.')
-            emphasize["" .. arg .. ""] = true
+            local estring = args:concat(" ")
+            local verb = emphasize[estring:lower()] and "Removed" or "Added"
+            print("Emphasize: " .. verb .. ' "' .. estring .. '".')
+            emphasize[estring:lower()] = emphasize[estring:lower()] and false or true
         end
     end
 )
@@ -65,9 +77,13 @@ windower.register_event(
 windower.register_event(
     "action",
     function(act)
-        local target = windower.ffxi.get_mob_by_target("t") and windower.ffxi.get_mob_by_target("t").id or nil
+        local target
 
-        if not target then
+        if windower.ffxi.get_mob_by_target("t") and windower.ffxi.get_mob_by_target("t").is_npc then
+            target = windower.ffxi.get_mob_by_target("t").id
+        elseif windower.ffxi.get_mob_by_target("bt") then
+            target = windower.ffxi.get_mob_by_target("bt").id
+        else
             return
         end
 
@@ -135,7 +151,7 @@ function show_caption(text, type)
         windower.prim.set_visibility(background_interrupt, true)
     end
 
-    if (emphasize[text]) then
+    if (emphasize[text:lower()]) then
         windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
     end
 
@@ -148,4 +164,8 @@ function hide_caption()
     windower.prim.set_visibility(background_ability, false)
     windower.prim.set_visibility(background_magic, false)
     windower.prim.set_visibility(background_interrupt, false)
+end
+
+function print(str)
+    windower.add_to_chat(207, str)
 end
