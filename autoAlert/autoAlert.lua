@@ -10,26 +10,33 @@ res = require("resources")
 background_ability = "background_ability"
 background_magic = "background_magic"
 background_interrupt = "background_interrupt"
-playerResolution = T {}
-playerResolution.x = windower.get_windower_settings().x_res
-playerResolution.y = windower.get_windower_settings().y_res
-emphasize = {}
 caption = texts.new({})
 showing = false
-last_trigger = -1
-trigger_duration = 3
+last_trigger = 0
+-- trigger_duration = 3
+-- emphasize = {}
+
+-- IDs
 weapon_skill_category = 7
 magic_category = 8
 interrupt_id = 28787
-background_size = regular
-x_position = playerResolution.x / 2
-y_position = 50
-background_size = "regular"
+-- x_position = playerResolution.x / 2
+-- y_position = 50
+-- background_size = "regular"
+
+defaults = {}
+defaults.x_position = windower.get_windower_settings().x_res / 2
+defaults.y_position = 50
+defaults.background_size = "regular"
+defaults.emphasize = {}
+defaults.trigger_duration = 3
+
+settings = config.load(defaults)
 
 windower.register_event(
     "load",
     function()
-        create_backgrounds(x_position - 250, y_position)
+        create_backgrounds(settings.x_position - 250, settings.y_position)
         caption:bg_visible(false)
         caption:bold(true)
     end
@@ -40,10 +47,10 @@ windower.register_event(
     function()
         if showing then
             local x, y = caption:extents()
-            local x_offset = x_position - x / 2
-            local y_offset = background_size == "regular" and y_position + 10 or y_position + 3
+            local x_offset = settings.x_position - x / 2
+            local y_offset = background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
             caption:pos(x_offset, y_offset)
-            if os.time() - last_trigger > trigger_duration then
+            if os.time() - last_trigger > settings.trigger_duration then
                 hide_caption()
             end
         else
@@ -73,9 +80,9 @@ windower.register_event(
             end
         elseif cmd == "emphasize" then
             local estring = args:concat(" ")
-            local verb = emphasize[estring:lower()] and "Removed" or "Added"
+            local verb = settings.emphasize[estring:lower()] and "Removed" or "Added"
             print("Emphasize: " .. verb .. ' "' .. estring .. '".')
-            emphasize[estring:lower()] = emphasize[estring:lower()] and false or true
+            settings.emphasize[estring:lower()] = settings.emphasize[estring:lower()] and false or true
         end
     end
 )
@@ -125,7 +132,7 @@ function create_backgrounds(x, y)
     windower.prim.set_fit_to_texture(background_ability, true)
     windower.prim.set_texture(
         background_ability,
-        windower.addon_path .. "images/" .. background_size .. "/background_ability.png"
+        windower.addon_path .. "images/" .. settings.background_size .. "/background_ability.png"
     )
     windower.prim.set_position(background_ability, x, y)
     windower.prim.set_visibility(background_ability, false)
@@ -134,7 +141,7 @@ function create_backgrounds(x, y)
     windower.prim.set_fit_to_texture(background_magic, true)
     windower.prim.set_texture(
         background_magic,
-        windower.addon_path .. "images/" .. background_size .. "/background_magic.png"
+        windower.addon_path .. "images/" .. settings.background_size .. "/background_magic.png"
     )
     windower.prim.set_position(background_magic, x, y)
     windower.prim.set_visibility(background_magic, false)
@@ -143,7 +150,7 @@ function create_backgrounds(x, y)
     windower.prim.set_fit_to_texture(background_interrupt, true)
     windower.prim.set_texture(
         background_interrupt,
-        windower.addon_path .. "images/" .. background_size .. "/background_interrupt.png"
+        windower.addon_path .. "images/" .. settings.background_size .. "/background_interrupt.png"
     )
     windower.prim.set_position(background_interrupt, x, y)
     windower.prim.set_visibility(background_interrupt, false)
@@ -166,7 +173,7 @@ function show_caption(text, type)
         windower.prim.set_visibility(background_interrupt, true)
     end
 
-    if (emphasize[text:lower()]) then
+    if (settings.emphasize[text:lower()]) then
         windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
     end
 
