@@ -12,6 +12,7 @@ caption = texts.new({})
 background_ability = "background_ability"
 background_magic = "background_magic"
 background_interrupt = "background_interrupt"
+background_emphasize = "background_emphasize"
 
 -- Timing
 showing = false
@@ -26,8 +27,9 @@ defaults = {}
 defaults.x_position = windower.get_windower_settings().x_res / 2
 defaults.y_position = 50
 defaults.background_size = "regular"
-defaults.emphasize = {}
+defaults.emphasize = S {}
 defaults.trigger_duration = 3
+defaults.sounds = "on"
 
 settings = config.load(defaults)
 
@@ -47,7 +49,7 @@ windower.register_event(
             local x, y = caption:extents()
             local x_offset = settings.x_position - x / 2
             local y_offset =
-                defaults.background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
+                settings.background_size == "regular" and settings.y_position + 10 or settings.y_position + 3
             caption:pos(x_offset, y_offset)
             if os.time() - last_trigger > settings.trigger_duration then
                 hide_caption()
@@ -63,15 +65,17 @@ windower.register_event(
         if not cmd or cmd == "help" then
             print("=== Usage Examples ===")
             print("//fa test ws")
-            print("→ Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
+            print("     Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
             print("//fa emphasize Firaga VI")
-            print("→ Emphasizes Firaga VI (toggles on and off) - plays a different sound.")
+            print('     Toggles emphasis for "Firaga VI" (plays a different sound).')
             print("//fa pos 960 200")
-            print("→ Moves the display to 960 X (horizontal) and 200 Y (vertical).")
+            print("     Moves the display to 960 X (horizontal) and 200 Y (vertical).")
             print("//fa size small")
-            print("→ Sets the display size to small (accepts 'regular' and 'small').")
+            print("     Sets the display size to small (accepts 'regular' and 'small').")
             print("//fa duration 5")
-            print("→ Sets the display duration to 5 seconds.")
+            print("     Sets the display duration to 5 seconds.")
+            print("//fa sounds off")
+            print("     Turns off sounds except for emphasized abilities (accepts 'on' and 'off').")
         end
 
         local args = L {...}
@@ -85,13 +89,13 @@ windower.register_event(
             end
         elseif cmd == "emphasize" then
             local estring = args:concat(" "):gsub("%s+", ""):lower()
-            local verb = settings.emphasize[estring] and "Removed" or "Added"
+            local verb = settings.emphasize:contains(estring) and "Removed" or "Added"
             print("Emphasize: " .. verb .. ' "' .. args:concat(" ") .. '".')
 
-            if settings.emphasize[estring] then
-                settings.emphasize[estring] = false
+            if settings.emphasize:contains(estring) then
+                settings.emphasize:remove(estring)
             else
-                settings.emphasize[estring] = true
+                settings.emphasize:add(estring)
             end
 
             settings:save()
@@ -127,6 +131,16 @@ windower.register_event(
                 print("Display duration set to " .. duration .. " secs.")
             else
                 print("Please specify a positive number.")
+            end
+        elseif cmd == "sounds" then
+            local state = args[1]
+
+            if state == "on" or state == "off" then
+                settings.sounds = state
+                settings:save()
+                print("Sounds have been turned " .. state .. ".")
+            else
+                print('Please specify "on" or "off" for sounds.')
             end
         end
     end
@@ -203,27 +217,41 @@ function create_backgrounds(x, y)
     )
     windower.prim.set_position(background_interrupt, x, y)
     windower.prim.set_visibility(background_interrupt, false)
+
+    windower.prim.create(background_emphasize)
+    windower.prim.set_fit_to_texture(background_emphasize, true)
+    windower.prim.set_texture(
+        background_emphasize,
+        windower.addon_path .. "images/" .. settings.background_size .. "/background_emphasize.png"
+    )
+    windower.prim.set_position(background_emphasize, x, y)
+    windower.prim.set_visibility(background_emphasize, false)
 end
 
 function show_caption(text, type)
+    local event_type
+
     hide_caption()
     showing = true
     caption:text(text)
     caption:show()
 
     if (type == "ws") then
-        windower.play_sound(windower.addon_path .. "sounds/ability_alert.wav")
+        event_type = "ability"
         windower.prim.set_visibility(background_ability, true)
     elseif (type == "ma") then
-        windower.play_sound(windower.addon_path .. "sounds/magic_alert.wav")
+        event_type = "magic"
         windower.prim.set_visibility(background_magic, true)
     elseif (type == "int") then
-        windower.play_sound(windower.addon_path .. "sounds/interrupt_alert.wav")
+        event_type = "interrupt"
         windower.prim.set_visibility(background_interrupt, true)
     end
 
-    if (settings.emphasize[text:gsub("%s+", ""):lower()]) then
+    if (settings.emphasize:contains(text:gsub("%s+", ""):lower())) then
         windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
+        windower.prim.set_visibility(background_emphasize, true)
+    elseif (settings.sounds == "on") then
+        windower.play_sound(windower.addon_path .. "sounds/" .. event_type .. "_alert.wav")
     end
 
     last_trigger = os.time()
@@ -235,6 +263,7 @@ function hide_caption()
     windower.prim.set_visibility(background_ability, false)
     windower.prim.set_visibility(background_magic, false)
     windower.prim.set_visibility(background_interrupt, false)
+    windower.prim.set_visibility(background_emphasize, false)
 end
 
 function print(str)
