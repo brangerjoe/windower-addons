@@ -91,9 +91,11 @@ windower.register_event(
             local y = tonumber(args[2])
 
             if type(x) == "number" and type(y) == "number" then
+                settings.x_position = x
+                settings.y_position = y
                 settings:save()
-                print("Moved display to: " .. args[1] .. ", " .. args[2])
                 refresh_backgrounds()
+                print("Moved display to: " .. args[1] .. ", " .. args[2])
             else
                 print("Please specify x and y coordinates.")
             end
@@ -111,7 +113,7 @@ windower.register_event(
         elseif cmd == "duration" then
             local duration = tonumber(args[1])
 
-            if type(duration) == number and duration > 0 then
+            if type(duration) == "number" and duration > 0 then
                 settings.trigger_duration = duration
                 print("Display duration set to " .. duration .. " secs.")
             else
