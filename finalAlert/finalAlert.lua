@@ -1,6 +1,6 @@
 _addon.name = "finalAlert"
 _addon.author = "Godchain"
-_addon.version = "1.2"
+_addon.version = "1.3"
 _addon.commands = {"finalAlert", "fa"}
 
 config = require("config")
@@ -25,7 +25,7 @@ interrupt_id = 28787
 
 defaults = {}
 defaults.x_position = windower.get_windower_settings().x_res / 2
-defaults.y_position = 50
+defaults.y_position = 100
 defaults.background_size = "regular"
 defaults.emphasize = S {}
 defaults.trigger_duration = 3
@@ -62,30 +62,32 @@ windower.register_event(
 windower.register_event(
     "addon command",
     function(cmd, ...)
-        if not cmd or cmd == "help" then
-            print("=== Usage Examples ===")
-            print("//fa test ws")
-            print("     Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
-            print("//fa emphasize Firaga VI")
-            print('     Toggles emphasis for "Firaga VI" (plays a different sound).')
-            print("//fa pos 960 200")
-            print("     Moves the display to 960 X (horizontal) and 200 Y (vertical).")
-            print("//fa size small")
-            print("     Sets the display size to small (accepts 'regular' and 'small').")
-            print("//fa duration 5")
-            print("     Sets the display duration to 5 seconds.")
-            print("//fa sounds off")
-            print("     Turns off sounds except for emphasized abilities (accepts 'on' and 'off').")
-        end
-
         local args = L {...}
-        if cmd == "test" then
+
+        if not cmd or cmd == "help" then
+            local bullet = windower.to_shift_jis("» ")
+            print("=== Usage Examples ===")
+            print(bullet .. "//fa test ws")
+            print("Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
+            print(bullet .. "//fa emphasize Firaga VI")
+            print('Toggles emphasis for "Firaga VI" (plays a different sound).')
+            print(bullet .. "//fa pos 960 200")
+            print("Moves the display to 960 X (horizontal) and 200 Y (vertical).")
+            print(bullet .. "//fa size small")
+            print("Sets the display size to small (accepts 'regular' and 'small').")
+            print(bullet .. "//fa duration 5")
+            print("Sets the display duration to 5 seconds.")
+            print(bullet .. "//fa sounds off")
+            print("Turns off sounds except for emphasized abilities (accepts 'on' and 'off').")
+        elseif cmd == "test" then
             if args[1] == "ws" then
                 show_caption("Self-Destruct", "ws")
             elseif args[1] == "ma" then
                 show_caption("Tornado II", "ma")
             elseif args[1] == "int" then
                 show_caption("Interrupted!", "int")
+            else
+                print('Please specify "ws", "ma" or "int".')
             end
         elseif cmd == "emphasize" then
             local estring = args:concat(" "):gsub("%s+", ""):lower()
@@ -142,6 +144,8 @@ windower.register_event(
             else
                 print('Please specify "on" or "off" for sounds.')
             end
+        else
+            print("Unrecognized command.")
         end
     end
 )
@@ -150,11 +154,13 @@ windower.register_event(
     "action",
     function(act)
         local target
+        local t = windower.ffxi.get_mob_by_target("t")
+        local bt = windower.ffxi.get_mob_by_target("bt")
 
-        if windower.ffxi.get_mob_by_target("t") and windower.ffxi.get_mob_by_target("t").is_npc then
-            target = windower.ffxi.get_mob_by_target("t").id
-        elseif windower.ffxi.get_mob_by_target("bt") then
-            target = windower.ffxi.get_mob_by_target("bt").id
+        if t and t.is_npc and not t.in_party and not t.in_alliance then
+            target = t.id
+        elseif bt then
+            target = bt.id
         else
             return
         end
