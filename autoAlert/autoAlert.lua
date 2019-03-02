@@ -1,28 +1,26 @@
 _addon.name = "autoAlert"
 _addon.author = "Godchain"
-_addon.version = "1.1"
+_addon.version = "1.2"
 _addon.commands = {"autoAlert", "aa"}
 
 config = require("config")
 texts = require("texts")
 res = require("resources")
 
+caption = texts.new({})
+
 background_ability = "background_ability"
 background_magic = "background_magic"
 background_interrupt = "background_interrupt"
-caption = texts.new({})
+
+-- Timing
 showing = false
 last_trigger = 0
--- trigger_duration = 3
--- emphasize = {}
 
 -- IDs
 weapon_skill_category = 7
 magic_category = 8
 interrupt_id = 28787
--- x_position = playerResolution.x / 2
--- y_position = 50
--- background_size = "regular"
 
 defaults = {}
 defaults.x_position = windower.get_windower_settings().x_res / 2
@@ -65,11 +63,15 @@ windower.register_event(
         if not cmd or cmd == "help" then
             print("=== Usage Examples ===")
             print("//aa test ws")
-            print("► Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
+            print("→ Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
             print("//aa emphasize Firaga VI")
-            print("► Emphasizes Firaga VI (toggles on and off).")
+            print("→ Emphasizes Firaga VI (toggles on and off) - plays a different sound.")
             print("//aa pos 960 200")
-            print("► Moves the display to 960 X (horizontal) and 200 Y (vertical).")
+            print("→ Moves the display to 960 X (horizontal) and 200 Y (vertical).")
+            print("//aa size small")
+            print("→ Sets the display size to small (accepts 'regular' and 'small').")
+            print("//aa duration 5")
+            print("→ Sets the display duration to 5 seconds.")
         end
 
         local args = L {...}
@@ -82,10 +84,11 @@ windower.register_event(
                 show_caption("Interrupted!", "int")
             end
         elseif cmd == "emphasize" then
-            local estring = args:concat(" ")
-            local verb = settings.emphasize[estring:lower()] and "Removed" or "Added"
-            print("Emphasize: " .. verb .. ' "' .. estring .. '".')
-            settings.emphasize[estring:lower()] = settings.emphasize[estring:lower()] and false or true
+            local estring = args:concat(" "):gsub("%s+", ""):lower()
+            local verb = settings.emphasize[estring] and "Removed" or "Added"
+            print("Emphasize: " .. verb .. ' "' .. args:concat(" ") .. '".')
+            settings.emphasize[estring] = settings.emphasize[estring] and false or true
+            settings:save()
         elseif cmd == "pos" then
             local x = tonumber(args[1])
             local y = tonumber(args[2])
@@ -213,7 +216,7 @@ function show_caption(text, type)
         windower.prim.set_visibility(background_interrupt, true)
     end
 
-    if (settings.emphasize[text:lower()]) then
+    if (settings.emphasize[text:gsub("%s+", ""):lower()]) then
         windower.play_sound(windower.addon_path .. "sounds/emphasize.wav")
     end
 
