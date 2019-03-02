@@ -1,6 +1,6 @@
 _addon.name = "finalAlert"
 _addon.author = "Godchain"
-_addon.version = "1.2"
+_addon.version = "1.3"
 _addon.commands = {"finalAlert", "fa"}
 
 config = require("config")
@@ -25,7 +25,7 @@ interrupt_id = 28787
 
 defaults = {}
 defaults.x_position = windower.get_windower_settings().x_res / 2
-defaults.y_position = 50
+defaults.y_position = 100
 defaults.background_size = "regular"
 defaults.emphasize = S {}
 defaults.trigger_duration = 3
@@ -154,11 +154,13 @@ windower.register_event(
     "action",
     function(act)
         local target
+        local t = windower.ffxi.get_mob_by_target("t")
+        local bt = windower.ffxi.get_mob_by_target("bt")
 
-        if windower.ffxi.get_mob_by_target("t") and windower.ffxi.get_mob_by_target("t").is_npc then
-            target = windower.ffxi.get_mob_by_target("t").id
-        elseif windower.ffxi.get_mob_by_target("bt") then
-            target = windower.ffxi.get_mob_by_target("bt").id
+        if t and t.is_npc and not t.in_party and not t.in_alliance then
+            target = t.id
+        elseif bt then
+            target = bt.id
         else
             return
         end
