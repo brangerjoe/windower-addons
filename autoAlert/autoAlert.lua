@@ -87,7 +87,13 @@ windower.register_event(
             local estring = args:concat(" "):gsub("%s+", ""):lower()
             local verb = settings.emphasize[estring] and "Removed" or "Added"
             print("Emphasize: " .. verb .. ' "' .. args:concat(" ") .. '".')
-            settings.emphasize[estring] = settings.emphasize[estring] and false or true
+
+            if settings.emphasize[estring] then
+                settings.emphasize[estring] = false
+            else
+                settings.emphasize[estring] = true
+            end
+
             settings:save()
         elseif cmd == "pos" then
             local x = tonumber(args[1])
