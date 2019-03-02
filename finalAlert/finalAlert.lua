@@ -1,7 +1,7 @@
-_addon.name = "autoAlert"
+_addon.name = "finalAlert"
 _addon.author = "Godchain"
 _addon.version = "1.2"
-_addon.commands = {"autoAlert", "aa"}
+_addon.commands = {"finalAlert", "fa"}
 
 config = require("config")
 texts = require("texts")
@@ -62,15 +62,15 @@ windower.register_event(
     function(cmd, ...)
         if not cmd or cmd == "help" then
             print("=== Usage Examples ===")
-            print("//aa test ws")
+            print("//fa test ws")
             print("→ Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
-            print("//aa emphasize Firaga VI")
+            print("//fa emphasize Firaga VI")
             print("→ Emphasizes Firaga VI (toggles on and off) - plays a different sound.")
-            print("//aa pos 960 200")
+            print("//fa pos 960 200")
             print("→ Moves the display to 960 X (horizontal) and 200 Y (vertical).")
-            print("//aa size small")
+            print("//fa size small")
             print("→ Sets the display size to small (accepts 'regular' and 'small').")
-            print("//aa duration 5")
+            print("//fa duration 5")
             print("→ Sets the display duration to 5 seconds.")
         end
 
