@@ -63,11 +63,13 @@ windower.register_event(
     "addon command",
     function(cmd, ...)
         if not cmd or cmd == "help" then
-            print("Usage Examples")
+            print("=== Usage Examples ===")
             print("//aa test ws")
             print("► Shows a test alert (accepts 'ws' for TP moves, 'ma' for magic, 'int' for interrupts).")
             print("//aa emphasize Firaga VI")
             print("► Emphasizes Firaga VI (toggles on and off).")
+            print("//aa pos 960 200")
+            print("► Moves the display to 960 X (horizontal) and 200 Y (vertical).")
         end
 
         local args = L {...}
@@ -85,11 +87,36 @@ windower.register_event(
             print("Emphasize: " .. verb .. ' "' .. estring .. '".')
             settings.emphasize[estring:lower()] = settings.emphasize[estring:lower()] and false or true
         elseif cmd == "pos" then
-            settings.x_position = args[1]
-            settings.y_position = args[2]
-            settings:save()
-            print("Moved display to: " .. args[1] .. "," .. args[2])
-            create_backgrounds(settings.x_position - 250, settings.y_position)
+            local x = tonumber(args[1])
+            local y = tonumber(args[2])
+
+            if type(x) == "number" and type(y) == "number" then
+                settings:save()
+                print("Moved display to: " .. args[1] .. ", " .. args[2])
+                refresh_backgrounds()
+            else
+                print("Please specify x and y coordinates.")
+            end
+        elseif cmd == "size" then
+            local size = args[1]
+
+            if size == "small" or size == "regular" then
+                settings.background_size = size
+                settings:save()
+                refresh_backgrounds()
+                print("Display size set to " .. size .. ".")
+            else
+                print('Please specify "small" or "regular" for the size.')
+            end
+        elseif cmd == "duration" then
+            local duration = tonumber(args[1])
+
+            if type(duration) == number and duration > 0 then
+                settings.trigger_duration = duration
+                print("Display duration set to " .. duration .. " secs.")
+            else
+                print("Please specify a positive number.")
+            end
         end
     end
 )
@@ -133,6 +160,10 @@ windower.register_event(
         end
     end
 )
+
+function refresh_backgrounds()
+    create_backgrounds(settings.x_position - 250, settings.y_position)
+end
 
 function create_backgrounds(x, y)
     windower.prim.create(background_ability)
