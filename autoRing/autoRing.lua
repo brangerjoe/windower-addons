@@ -12,8 +12,9 @@ item_info = {
     ["capacity"] = {id = 28546, japanese = "キャパシティリング", english = "Capacity Ring", slot = 13},
     ["warp"] = {id = 28540, japanese = "デジョンリング", english = "Warp Ring", slot = 13},
     ["caliber"] = {id = 26164, japanese = "カリバーリング", english = "Caliber Ring", slot = 13},
-    ["empress"] = {id = 15224, japanese = "姫帝羽虫の髪飾り", english = "Empress Hairpin", slot = 13},
-    ["dem"] = {id = 26177, japanese = "Ｄ．デムリング", english = "Dim. Ring (Dem)", slot = 13}
+    ["empress"] = {id = 15762, japanese = "女帝の指輪", english = "Empress Band", slot = 13},
+    ["dem"] = {id = 26177, japanese = "Ｄ．デムリング", english = "Dim. Ring (Dem)", slot = 13},
+    ["echad"] = {id = 27556, japanese = "エチャドリング", english = "Echad Ring", slot = 13}
 }
 
 function search_item(ring)
