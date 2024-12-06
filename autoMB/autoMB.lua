@@ -13,6 +13,10 @@ local skillchains = {
     [299] = {id = 299, english = "Scission", elements = {"Earth"}},
     [300] = {id = 300, english = "Detonation", elements = {"Wind"}},
     [301] = {id = 301, english = "Impaction", elements = {"Thunder"}}
+    [767] = {id=767,english='Radiance',elements={'Light','Thunder','Wind','Fire'}},
+	[768] = {id=768,english='Umbra',elements={'Dark','Ice','Water','Earth'}},
+	[769] = {id=769,english='Radiance',elements={'Light','Thunder','Wind','Fire'}},
+	[770] = {id=770,english='Umbra',elements={'Dark','Ice','Water','Earth'}},
 }
 
 windower.register_event(
